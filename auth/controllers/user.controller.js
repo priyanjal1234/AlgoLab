@@ -2,6 +2,7 @@ import userModel from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import generateVerificationCode from "../utils/generateVerificationCode.js";
+import callUser from "../utils/callUser.js";
 
 export const registerUser = async function (req, res) {
   try {
@@ -27,6 +28,7 @@ export const registerUser = async function (req, res) {
       verificationCode,
     });
 
+    await callUser(phone, verificationCode);
     return res
       .status(201)
       .json({ message: "Wait for the phone call for the OTP" });
