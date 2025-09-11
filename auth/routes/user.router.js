@@ -5,6 +5,8 @@ import {
   logoutUser,
   registerUser,
   verifyPhone,
+  vonageWebhooksAnswer,
+  vonageWebhooksEvents,
 } from "../controllers/user.controller.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 
@@ -19,5 +21,9 @@ router.route("/login").post(loginUser);
 router.route("/logout").get(logoutUser);
 
 router.route("/profile").get(authMiddleware, getUser);
+
+router.route("/webhooks/answer").get(authMiddleware,vonageWebhooksAnswer)
+
+router.route("/webhooks/events").post(vonageWebhooksEvents)
 
 export default router;

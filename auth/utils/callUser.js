@@ -6,7 +6,7 @@ import fs from "fs";
 import path from "path";
 
 const vonage = new Vonage({
-  applicationId: "5fe70c0c-16bb-442b-9ed2-3cb5423eecf5", 
+  applicationId: "554d4577-fa4c-43a4-a6b2-53a034ca56cb",
   privateKey: fs.readFileSync(path.resolve("secret", "private.key"), "utf8"),
 });
 
@@ -21,8 +21,8 @@ async function callUser(phoneNumber, code) {
 
   try {
     const response = await vonage.voice.createOutboundCall({
-      to: [{ type: "phone", number: "+918218411944" }],
-      from: { type: "phone", number: "447700900000" },
+      to: [{ type: "phone", number: phoneNumber }],
+      from: { type: "phone", number: "12345678901" },
       ncco,
     });
 

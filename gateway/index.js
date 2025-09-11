@@ -1,26 +1,26 @@
-import dotenv from 'dotenv'
-dotenv.config()
+import dotenv from "dotenv";
+dotenv.config();
 
 import express from "express";
-import { createProxyMiddleware } from "http-proxy-middleware";
+import proxy from "express-http-proxy";
+import cors from "cors";
 
 const app = express();
 
-const services = {
-  auth: "http://localhost:3001",
-};
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(
-  "/api/auth",
-  createProxyMiddleware({
-    target: services.auth,
-    changeOrigin: true,
-    pathRewrite: { "^/api/auth": "" },
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
   })
 );
 
+app.use("/api/auth", proxy("http://localhost:3001"));
 
-const port = process.env.PORT || 4000
-app.listen(port,function() {
-    console.log(`Gateway is running on port ${port}`)
-})
+app.use("/api/problems", proxy("http://localhost:3002"));
+
+const port = process.env.PORT || 4000;
+app.listen(port, function () {
+  console.log(`Gateway is running on port ${port}`);
+});

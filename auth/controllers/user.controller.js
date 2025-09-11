@@ -27,8 +27,9 @@ export const registerUser = async function (req, res) {
       phone,
       verificationCode,
     });
-
-    await callUser(phone, verificationCode);
+    const token = jwt.sign({ name, email,id: user._id }, process.env.JWT_KEY);
+    res.cookie("token", token);
+    // await callUser(phone, verificationCode);
     return res
       .status(201)
       .json({ message: "Wait for the phone call for the OTP" });
@@ -132,4 +133,31 @@ export const getUser = async function (req, res) {
           : `Error fetching the user: ${error}`,
     });
   }
+};
+
+export const vonageWebhooksAnswer = async function (req, res) {
+  try {
+    let user = await userModel.findOne({ email: req.user.email });
+    let code = user.verificationCode;
+    const ncco = [
+      {
+        action: "talk",
+        voiceName: "Joey",
+        text: `Hello. Your verification code is ${code}`,
+      },
+    ];
+    return res.json(ncco);
+  } catch (error) {
+    return res.status(500).json({
+      message:
+        error instanceof Error
+          ? error.message
+          : `Error getting the answer from vonage: ${error}`,
+    });
+  }
+};
+
+export const vonageWebhooksEvents = function (req, res) {
+  console.log("Event:", req.body);
+  res.sendStatus(200);
 };
