@@ -1,6 +1,6 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
-import cors from 'cors'
+
 
 // Route Imports 
 import userRouter from './routes/user.router.js'
