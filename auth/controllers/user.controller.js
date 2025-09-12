@@ -27,7 +27,7 @@ export const registerUser = async function (req, res) {
       phone,
       verificationCode,
     });
-    const token = jwt.sign({ name, email,id: user._id }, process.env.JWT_KEY);
+    const token = jwt.sign({ name, email, id: user._id }, process.env.JWT_KEY);
     res.cookie("token", token);
     // await callUser(phone, verificationCode);
     return res
@@ -91,7 +91,10 @@ export const loginUser = async function (req, res) {
     let isMatch = await bcrypt.compare(password, user.password);
 
     if (isMatch) {
-      let token = jwt.sign({ email, name: user.name }, process.env.JWT_KEY);
+      let token = jwt.sign(
+        { email, name: user.name, id: user._id },
+        process.env.JWT_KEY
+      );
       res.cookie("token", token);
       return res.status(200).json({ message: "Login Success" });
     } else {
