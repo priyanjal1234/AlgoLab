@@ -8,7 +8,7 @@ const JUDGE0_URL = "http://<your-ec2-ip>:2358";
 const PROBLEM_SERVICE = "http://localhost:3002";
 
 const codeWorker = new Worker(
-    "submissions",
+    "submission",
     async (job) => {
         console.log(`⚡ Processing submission ${job.data.submissionId}`);
 
