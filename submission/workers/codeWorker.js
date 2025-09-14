@@ -7,7 +7,7 @@ const connection = new IORedis();
 const JUDGE0_URL = "http://<your-ec2-ip>:2358";
 const PROBLEM_SERVICE = "http://localhost:3002";
 
-const submissionWorker = new Worker(
+const codeWorker = new Worker(
     "submissions",
     async (job) => {
         console.log(`⚡ Processing submission ${job.data.submissionId}`);
@@ -79,6 +79,6 @@ const submissionWorker = new Worker(
     { connection }
 );
 
-submissionWorker.on("failed", (job, err) => {
+codeWorker.on("failed", (job, err) => {
     console.error(`❌ Job ${job.id} failed:`, err.message);
 });
