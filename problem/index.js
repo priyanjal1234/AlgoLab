@@ -8,7 +8,7 @@ db()
   .then(function () {
     const port = process.env.PORT || 4002;
     app.listen(port, function () {
-      console.log(`Server is running on port ${port}`);
+      console.log(`Problem service is running on port ${port}`);
     });
   })
   .catch(function (error) {

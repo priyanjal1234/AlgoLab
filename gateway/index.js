@@ -20,6 +20,8 @@ app.use("/api/auth", proxy("http://localhost:3001"));
 
 app.use("/api/problems", proxy("http://localhost:3002"));
 
+app.use("/api/submissions", proxy("http://localhost:3003"));
+
 const port = process.env.PORT || 4000;
 app.listen(port, function () {
   console.log(`Gateway is running on port ${port}`);

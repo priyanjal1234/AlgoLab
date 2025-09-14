@@ -6,9 +6,9 @@ import db from "./config/db.js";
 
 db()
   .then(function () {
-    const port = process.env.PORT || 4001;
+    const port = process.env.PORT || 4003;
     app.listen(port, function () {
-      console.log(`Auth service is running on port ${port}`);
+      console.log(`Submission service is running on port ${port}`);
     });
   })
   .catch(function (error) {
