@@ -5,7 +5,7 @@ const Features = ({features}) => {
     <section id="features" className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Why Choose CodeArena?</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Why Choose AlgoLab?</h2>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
               Everything you need to become a better programmer and land your dream job
             </p>
