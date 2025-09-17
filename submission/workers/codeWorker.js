@@ -1,24 +1,64 @@
+import path from "path";
+import dotenv from "dotenv";
+dotenv.config({ path: "../.env" });
+
 import { Worker } from "bullmq";
 import axios from "axios";
 import IORedis from "ioredis";
+import mongoose from "mongoose";
 import submissionModel from "../models/submission.model.js";
 
-const connection = new IORedis();
-const JUDGE0_URL = "https://algolab.skillify-lms.xyz";
+// ================= Redis Connection =================
+const connection = new IORedis({
+  maxRetriesPerRequest: null, // ✅ Required for BullMQ
+});
 
-const PROBLEM_SERVICE = "http://localhost:3002";
+connection.on("connect", () => console.log("✅ Redis connected in worker"));
+connection.on("error", (err) =>
+  console.error("❌ Redis connection error:", err.message)
+);
 
+// ================= MongoDB Connection =================
+async function connectDB() {
+  try {
+    const conn = await mongoose.connect(String(process.env.MONGODB_URI));
+    console.log(`✅ MongoDB connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error("❌ MongoDB connection error:", error.message);
+  }
+}
+connectDB();
+
+// ================= Constants =================
+const JUDGE0_URL = "https://algolab.skillify-lms.xyz"; // Your Judge0 base URL
+const PROBLEM_SERVICE = "http://localhost:3000/api/problems"; // Gateway URL
+
+// ================= Helpers =================
+function getLanguageId(language, fallbackId) {
+  if (fallbackId) return fallbackId;
+  const map = {
+    C: 50,
+    "C++": 54,
+    Java: 62,
+    Javascript: 63,
+    Python: 71,
+  };
+  return map[language] || 71;
+}
+
+// ================= Worker =================
 const codeWorker = new Worker(
   "submission",
   async (job) => {
-    console.log(`⚡ Processing submission ${job.data.submissionId}`);
+    console.log(`🚀 Processing submission ${job.data.submissionId}`);
 
     const { submissionId, code, language, languageId, problemId } = job.data;
 
+    // ---------- Step 1: Fetch problem test cases ----------
     let testCases = [];
     try {
       const response = await axios.get(
-        `${PROBLEM_SERVICE}/problems/${problemId}`
+        `${PROBLEM_SERVICE}/internal/${problemId}`
       );
       testCases = response.data.testCases || [];
     } catch (err) {
@@ -29,6 +69,7 @@ const codeWorker = new Worker(
       return;
     }
 
+    // ---------- Step 2: Run test cases on Judge0 ----------
     let allPassed = true;
     const results = [];
 
@@ -54,8 +95,7 @@ const codeWorker = new Worker(
         });
 
         if (!passed) allPassed = false;
-      } catch (err) {
-        console.error("❌ Judge0 execution error:", err.message);
+      } catch {
         results.push({
           input: tc.input,
           expected: tc.expectedOutput,
@@ -66,20 +106,31 @@ const codeWorker = new Worker(
       }
     }
 
-    await submissionModel.findByIdAndUpdate(submissionId, {
-      status: allPassed ? "accepted" : "failed",
-      results,
-    });
-
-    console.log(
-      `✅ Submission ${submissionId} evaluated → ${
-        allPassed ? "ACCEPTED" : "FAILED"
-      }`
-    );
+    // ---------- Step 3: Update submission ----------
+    try {
+      await submissionModel.findByIdAndUpdate(
+        new mongoose.Types.ObjectId(submissionId),
+        {
+          status: allPassed ? "accepted" : "failed",
+          results,
+        },
+        { new: true }
+      );
+      console.log(
+        `✅ Submission ${submissionId} → ${allPassed ? "ACCEPTED" : "FAILED"}`
+      );
+    } catch (err) {
+      console.error("❌ Failed to update submission:", err.message);
+    }
   },
   { connection }
 );
 
+// ================= Worker Events =================
+codeWorker.on("completed", (job) => {
+  console.log(`🎉 Job ${job.id} completed`);
+});
+
 codeWorker.on("failed", (job, err) => {
-  console.error(`❌ Job ${job.id} failed:`, err.message);
+  console.error(`💥 Job ${job?.id} failed:`, err.message);
 });
