@@ -5,6 +5,7 @@ export const createProblem = async function (req, res) {
     let {
       title,
       slug,
+      category,
       description,
       difficulty,
       tags,
@@ -16,6 +17,7 @@ export const createProblem = async function (req, res) {
     if (
       !title ||
       !slug ||
+      !category ||
       !description ||
       !difficulty ||
       !Array.isArray(tags) ||
@@ -40,6 +42,7 @@ export const createProblem = async function (req, res) {
       createdBy: req.user.id,
       title,
       slug,
+      category,
       description,
       difficulty,
       tags,

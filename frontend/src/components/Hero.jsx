@@ -1,7 +1,9 @@
 import { ArrowRight, Target } from "lucide-react";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <section className="pt-20 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
@@ -28,8 +30,10 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            
-            <button className="border border-gray-600 hover:border-gray-400 px-8 py-4 rounded-lg transition-all duration-300 hover:bg-gray-900">
+            <button
+              onClick={() => navigate("/problems")}
+              className="border border-gray-600 hover:border-gray-400 px-8 py-4 rounded-lg transition-all duration-300 hover:bg-gray-900"
+            >
               View Problems
             </button>
           </div>
