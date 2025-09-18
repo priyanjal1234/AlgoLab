@@ -28,9 +28,9 @@ export const registerUser = async function (req, res) {
       verificationCode,
     });
     const token = jwt.sign({ name, email, id: user._id }, process.env.JWT_KEY);
-    res.cookie("token", token,{
-        maxAge: 10 * 365 * 24 * 60 * 60 * 1000 // 10 years in milliseconds
-      });
+    res.cookie("token", token, {
+      maxAge: 10 * 365 * 24 * 60 * 60 * 1000, // 10 years in milliseconds
+    });
     // await callUser(phone, verificationCode);
     return res
       .status(201)
@@ -60,8 +60,8 @@ export const verifyPhone = async function (req, res) {
     }
     if (String(otp) === String(user.verificationCode)) {
       const token = jwt.sign({ name, email }, process.env.JWT_KEY);
-      res.cookie("token", token,{
-        maxAge: 10 * 365 * 24 * 60 * 60 * 1000 // 10 years in milliseconds
+      res.cookie("token", token, {
+        maxAge: 10 * 365 * 24 * 60 * 60 * 1000, // 10 years in milliseconds
       });
 
       return res.status(201).json({ message: "Registration Successfull" });
@@ -100,7 +100,7 @@ export const loginUser = async function (req, res) {
         process.env.JWT_KEY
       );
       res.cookie("token", token, {
-        maxAge: 10 * 365 * 24 * 60 * 60 * 1000 // 10 years in milliseconds
+        maxAge: 10 * 365 * 24 * 60 * 60 * 1000, // 10 years in milliseconds
       });
       return res.status(200).json({ message: "Login Success" });
     } else {
@@ -132,7 +132,29 @@ export const logoutUser = function (req, res) {
 
 export const getUser = async function (req, res) {
   try {
-    const user = await userModel.findOne({ email: req.user.email }).select("-password");
+    let user = null;
+
+    // 🔹 Check if req.user has email
+    if (!req.user?.email) {
+      return res.status(400).json({ message: "User email not found in token" });
+    }
+
+    const { email, name } = req.user;
+
+    user = await userModel.findOne({ email }).select("-password");
+
+    if (!user && req.user?.firebase) {
+      user = await userModel.create({
+        name: name || "No Name",
+        email,
+      });
+      
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({

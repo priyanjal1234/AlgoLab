@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
+import admin from "../config/firebaseAdmin.js"; // jahan aapka admin SDK init hai
 
-const authMiddleware = function (req, res, next) {
+const authMiddleware = async function (req, res, next) {
   try {
     const token = req.cookies.token;
 
@@ -8,9 +9,35 @@ const authMiddleware = function (req, res, next) {
       return res.status(404).json({ message: "Token not found" });
     }
 
-    const data = jwt.verify(token, process.env.JWT_KEY);
-    req.user = data;
-    next();
+    let userData = null;
+    let errors = {};
+
+    // 🔹 1. Try verifying as Firebase session cookie
+    try {
+      userData = await admin.auth().verifySessionCookie(token, true);
+      
+      req.user = userData;
+     
+      return next();
+    } catch (err) {
+      errors.firebaseErr = err.message;
+    }
+
+    // 🔹 2. Try verifying as our own JWT
+    try {
+      userData = jwt.verify(token, process.env.JWT_KEY);
+      req.user = userData;
+      
+      return next();
+    } catch (err) {
+      errors.jwtErr = err.message;
+    }
+
+    // 🔹 If neither worked, send error
+    return res.status(401).json({
+      message: "Invalid token (neither Firebase session cookie nor App JWT)",
+      errors,
+    });
   } catch (error) {
     return res.status(500).json({
       message:
@@ -21,4 +48,4 @@ const authMiddleware = function (req, res, next) {
   }
 };
 
-export default authMiddleware
+export default authMiddleware;
