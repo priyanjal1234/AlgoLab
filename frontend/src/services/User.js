@@ -1,4 +1,6 @@
+import { auth, googleProvider } from "../firebase/index.js";
 import api from "./api.js";
+import { signInWithPopup, signOut } from "firebase/auth";
 
 class UserService {
   constructor() {
@@ -28,9 +30,10 @@ class UserService {
 
   async logout() {
     try {
-      return await this.api.get(`${this.baseUrl}/logout`, {
+      await this.api.get(`${this.baseUrl}/logout`, {
         withCredentials: true,
       });
+      await signOut(auth);
     } catch (error) {
       throw error;
     }
@@ -41,6 +44,15 @@ class UserService {
       return await this.api.get(`${this.baseUrl}/profile`, {
         withCredentials: true,
       });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async signInWithGoogle() {
+    try {
+      let result = await signInWithPopup(auth, googleProvider);
+      return result.user;
     } catch (error) {
       throw error;
     }

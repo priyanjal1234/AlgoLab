@@ -23,6 +23,8 @@ import problemService from "../services/Problem";
 import userService from "../services/User";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../redux/reducers/UserReducer";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase";
 
 const mockProblems = [
   {
@@ -168,7 +170,16 @@ function ProblemsPage() {
   const [selectedTags, setSelectedTags] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      const userObj = {
+        name: currentUser.displayName,
+        email: currentUser.email
+      }
+      dispatch(setUser(userObj))
+    });
+    return () => unsubscribe();
+  }, []);
 
   let dispatch = useDispatch();
 

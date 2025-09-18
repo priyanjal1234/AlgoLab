@@ -81,6 +81,18 @@ const Register = () => {
     }
   }
 
+  async function handleGoogleLogin() {
+    try {
+      await userService.signInWithGoogle();
+      dispatch(setLoggedin(true));
+      navigate("/problems")
+    } catch (error) {
+      console.log(
+        error instanceof Error ? error.message : "Error in google login"
+      );
+    }
+  }
+
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
       <div className="max-w-md w-full">
@@ -240,7 +252,10 @@ const Register = () => {
 
           {/* Social Login */}
           <div className="space-y-3">
-            <button className="w-full bg-gray-800 hover:bg-gray-700 border border-gray-700 py-3 rounded-lg transition-colors flex items-center justify-center space-x-2">
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full bg-gray-800 hover:bg-gray-700 border border-gray-700 py-3 rounded-lg transition-colors flex items-center justify-center space-x-2"
+            >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
