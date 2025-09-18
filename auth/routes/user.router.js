@@ -32,33 +32,35 @@ router.route("/set-cookie").post(async function (req, res) {
     const { token } = req.body;
 
     if (!token) {
-      console.warn("⚠️ No token provided in request body");
       return res.status(400).json({ error: "Token not found in request body" });
     }
 
-    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
+    let cookieToken = token;
+    let expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
 
-    // Try to create Firebase session cookie
-    const sessionCookie = await admin
-      .auth()
-      .createSessionCookie(token, { expiresIn });
+    // Try Firebase ID token first
+    try {
+      cookieToken = await admin
+        .auth()
+        .createSessionCookie(token, { expiresIn });
+    } catch (err) {
+      console.warn("⚠️ Not a Firebase token, assuming app JWT:", err.message);
+      cookieToken = token; // fallback: set app JWT directly
+      expiresIn = 7 * 24 * 60 * 60 * 1000; // 1 week for app JWT
+    }
 
-    // Set cookie in response
-    res.cookie("token", sessionCookie, {
+    // Set cookie
+    res.cookie("token", cookieToken, {
       maxAge: expiresIn,
       httpOnly: true,
-      secure: false, // keep false for localhost, true in production
+      secure: false, // true in prod
       sameSite: "strict",
     });
 
     res.json({ message: "Cookie set successfully" });
   } catch (error) {
     console.error("❌ Error while setting cookie:", error);
-
-    res.status(401).json({
-      error: "Unauthorized",
-      details: error.message || error,
-    });
+    res.status(401).json({ error: "Unauthorized", details: error.message });
   }
 });
 
