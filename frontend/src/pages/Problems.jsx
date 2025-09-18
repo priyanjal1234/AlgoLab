@@ -20,6 +20,9 @@ import ProblemsNavbar from "../components/ProblemsNavbar";
 import FiltersSidebar from "../components/FiltersSidebar";
 import ProblemsTable from "../components/ProblemsTable";
 import problemService from "../services/Problem";
+import userService from "../services/User";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../redux/reducers/UserReducer";
 
 const mockProblems = [
   {
@@ -165,22 +168,46 @@ function ProblemsPage() {
   const [selectedTags, setSelectedTags] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
 
+  
+
+  let dispatch = useDispatch();
+
   const problemsPerPage = 20;
 
   // Get unique values for filters
   const difficulties = ["Easy", "Medium", "Hard"];
   const statuses = ["Solved", "Attempted", "Todo"];
-  const categories = ["Arrays","Strings","Hash","HashMap","Linked List","Dynamic Programming"];
+  const categories = [
+    "Arrays",
+    "Strings",
+    "Hash",
+    "HashMap",
+    "Linked List",
+    "Dynamic Programming",
+  ];
   const allTags = [...new Set(problems.flatMap((p) => p.tags))];
+
+  async function getLoggedinUser() {
+    try {
+      let getUserRes = await userService.getUser();
+      dispatch(setUser(getUserRes.data));
+    } catch (error) {
+      console.log(error?.response?.data?.message);
+    }
+  }
 
   async function fetchProblems() {
     try {
       let res = await problemService.getAllProblems();
-      setProblems(res.data)
+      setProblems(res.data);
     } catch (error) {
-      console.log(error);
+      console.log(error?.response?.data?.message);
     }
   }
+
+  useEffect(() => {
+    getLoggedinUser();
+  }, []);
 
   useEffect(() => {
     fetchProblems();

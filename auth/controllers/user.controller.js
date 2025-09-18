@@ -126,7 +126,7 @@ export const logoutUser = function (req, res) {
 
 export const getUser = async function (req, res) {
   try {
-    const user = await userModel.findOne({ email: req.user.email });
+    const user = await userModel.findOne({ email: req.user.email }).select("-password");
     return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({

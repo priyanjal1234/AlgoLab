@@ -1,9 +1,28 @@
 import { ArrowRight, Code, Menu, X } from "lucide-react";
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import userService from "../services/User";
+import { toast } from "react-toastify";
+import { setLoggedin, setUser } from "../redux/reducers/UserReducer";
 
 const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
+  let { user, isLoggedin } = useSelector((state) => state.user);
+
+  async function handleLogout() {
+    try {
+      let logoutRes = await userService.logout()
+      toast.success("Logout Successfull")
+      dispatch(setLoggedin(false))
+      dispatch(setUser(null))
+      navigate("/")
+    } catch (error) {
+      toast.error(error?.response?.data?.message)
+    }
+  }
+
   return (
     <nav className="fixed w-full top-0 z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,13 +60,20 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
               Pricing
             </a>
 
-            <button
-              onClick={() => navigate("/register")}
-              className="bg-green-500 hover:bg-green-600 text-black font-semibold px-8 py-2 rounded-lg transition-all duration-300 transform  flex items-center space-x-2 group"
-            >
-              <span>Get Started</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+            {isLoggedin && user ? (
+              <>
+              <button className="text-lg">{user?.name}</button>
+              <button onClick={handleLogout} className="text-red-500">Logout</button>
+              </>
+            ) : (
+              <button
+                onClick={() => navigate("/register")}
+                className="bg-green-500 hover:bg-green-600 text-black font-semibold px-8 py-2 rounded-lg transition-all duration-300 transform  flex items-center space-x-2 group"
+              >
+                <span>Get Started</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            )}
           </div>
 
           <button

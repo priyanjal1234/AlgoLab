@@ -1,8 +1,28 @@
 import { ArrowLeft, Code, Filter } from "lucide-react";
 import React from "react";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import userService from "../services/User";
+import { setLoggedin, setUser } from "../redux/reducers/UserReducer";
+import { toast } from "react-toastify";
 
-const ProblemsNavbar = ({showFilters,setShowFilters}) => {
+const ProblemsNavbar = ({ showFilters, setShowFilters }) => {
+  let { isLoggedin, user } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  async function handleLogout() {
+    try {
+      let logoutRes = await userService.logout();
+      toast.success("Logout Successfull");
+      dispatch(setLoggedin(false));
+      dispatch(setUser(null));
+      navigate("/");
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
+  }
+
   return (
     <nav className="bg-black border-b border-gray-800 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -31,18 +51,29 @@ const ProblemsNavbar = ({showFilters,setShowFilters}) => {
               <Filter className="w-4 h-4" />
               <span>Filters</span>
             </button>
-            <Link
-              to="/login"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/register"
-              className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition-colors"
-            >
-              Get Started
-            </Link>
+            {isLoggedin ? (
+              <>
+                <button className="text-lg">{user?.name}</button>
+                <button onClick={handleLogout} className="text-red-500">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition-colors"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
