@@ -85,8 +85,8 @@ export const getAllProblems = async function (req, res) {
 
 export const getProblemDetails = async function (req, res) {
   try {
-    let { problemId } = req.params;
-    let problem = await problemModel.findOne({ _id: problemId });
+    let { slug } = req.params;
+    let problem = await problemModel.findOne({ slug });
     if (!problem)
       return res
         .status(404)

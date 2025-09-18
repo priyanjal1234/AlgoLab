@@ -28,7 +28,9 @@ export const registerUser = async function (req, res) {
       verificationCode,
     });
     const token = jwt.sign({ name, email, id: user._id }, process.env.JWT_KEY);
-    res.cookie("token", token);
+    res.cookie("token", token,{
+        maxAge: 10 * 365 * 24 * 60 * 60 * 1000 // 10 years in milliseconds
+      });
     // await callUser(phone, verificationCode);
     return res
       .status(201)
@@ -58,7 +60,9 @@ export const verifyPhone = async function (req, res) {
     }
     if (String(otp) === String(user.verificationCode)) {
       const token = jwt.sign({ name, email }, process.env.JWT_KEY);
-      res.cookie("token", token);
+      res.cookie("token", token,{
+        maxAge: 10 * 365 * 24 * 60 * 60 * 1000 // 10 years in milliseconds
+      });
 
       return res.status(201).json({ message: "Registration Successfull" });
     } else {
@@ -95,7 +99,9 @@ export const loginUser = async function (req, res) {
         { email, name: user.name, id: user._id },
         process.env.JWT_KEY
       );
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        maxAge: 10 * 365 * 24 * 60 * 60 * 1000 // 10 years in milliseconds
+      });
       return res.status(200).json({ message: "Login Success" });
     } else {
       return res.status(401).json({ message: "Invalid Credentials" });

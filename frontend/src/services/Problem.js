@@ -15,6 +15,18 @@ class ProblemService {
       throw error;
     }
   }
+
+  async getOneProblem(slug) {
+    try {
+      return await this.api.get(`${this.baseUrl}/problem/${slug}`, {
+        withCredentials: true,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  
 }
 
 let problemService = new ProblemService();

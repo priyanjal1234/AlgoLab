@@ -13,7 +13,7 @@ router.route("/create").post(authMiddleware, createProblem);
 
 router.route("/all-problems").get(getAllProblems);
 
-router.route("/problem/:problemId").get(authMiddleware, getProblemDetails);
+router.route("/problem/:slug").get(authMiddleware, getProblemDetails);
 
 router.route("/cat-problems/:category").get(getProblemsByCategory);
 

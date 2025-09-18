@@ -23,13 +23,15 @@ const ProblemsNavbar = ({ showFilters, setShowFilters }) => {
     }
   }
 
+  
+
   return (
     <nav className="bg-black border-b border-gray-800 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-4">
             <Link
-              to="/"
+              to={window.location.href === "http://localhost:5173/problems" ? "/" : "/problems"}
               className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
