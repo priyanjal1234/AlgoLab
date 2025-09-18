@@ -42,22 +42,22 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
               Features
             </a>
             <a
-              href="#problems"
+              href="#topics"
               className="text-gray-300 hover:text-white transition-colors"
             >
-              Problems
+              Topics
             </a>
             <a
-              href="#contests"
+              href="#testimonials"
               className="text-gray-300 hover:text-white transition-colors"
             >
-              Contests
+              Testimonials
             </a>
             <a
-              href="#pricing"
+              href="#cta"
               className="text-gray-300 hover:text-white transition-colors"
             >
-              Pricing
+              Call To Action
             </a>
 
             {isLoggedin && user ? (

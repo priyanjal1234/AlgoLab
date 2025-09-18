@@ -3,7 +3,7 @@ import React from "react";
 
 const ProbCategories = () => {
   return (
-    <section className="py-20 px-4 bg-gray-950">
+    <section id="topics" className="py-20 px-4 bg-gray-950">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">

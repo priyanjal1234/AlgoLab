@@ -2,7 +2,7 @@ import React from "react";
 
 const CTA = () => {
   return (
-    <section className="py-20 px-4 bg-gradient-to-r from-gray-900 to-black">
+    <section id="cta" className="py-20 px-4 bg-gradient-to-r from-gray-900 to-black">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-4xl md:text-5xl font-bold mb-6">
           Ready to Start Your Journey?
