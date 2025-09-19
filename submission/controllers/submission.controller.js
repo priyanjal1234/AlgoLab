@@ -4,7 +4,7 @@ import submissionModel from "../models/submission.model.js";
 
 export const createSubmission = async (req, res) => {
   try {
-    const user = req.user.id;
+    const user = req.user.id || req.user.name;
     const { problemId } = req.params;
     const { code, language, languageId } = req.body;
 
